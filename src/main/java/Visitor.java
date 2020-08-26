@@ -1,113 +1,80 @@
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
-import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
+public class Visitor {
+    private String fullName, assistant_Name, comments;
+    LocalDate dateOfVisit;
+    LocalTime timeOfVisits;
+    int age;
 
-public  class Visitor {
+    static final Logger logger = LogManager.getLogger(Visitor.class.getName());
 
-    private static final Logger logger = LogManager.getLogger(Visitor.class.getName());
-
-
-    public static void main(String[] args){
-
-        Visitor visit = new Visitor();
-        visit.setVisitorName("Tokelo lebepe");
-        visit.setAge(25);
-        visit.setComments("How can we help you");
-        visit.setAssistantName("Tebogo lebepe");
- System.out.println(Save());
-
+    public Visitor() {
+        this.fullName = fullName;
+        this.assistant_Name = assistant_Name;
+        this.comments = comments;
+        this.dateOfVisit = dateOfVisit;
+        this.timeOfVisits = timeOfVisits;
+        this.age = age;
     }
-  public  static String visitorName;
-    public static int age;
-  public static   DateTimeFormatter date;
-  public  static String comments;
-   public static String assistantName;
 
-
-
-    public String getVisitorName(){
-        return visitorName;
+    public Visitor(String fullName, String nameOfPersonWhoAssistedTheVisitor, String comments, LocalDate dateOfVisit, LocalTime timeOfVisits, int age) {
     }
-    public void setVisitorName(String name){
-        visitorName = name;
 
-    }
-public int getAge(){
-        return  age;
-}
-public  void setAge(int age){
-        age = age;
-}
-public  String getComments(){
-        return comments;
-}
-public void setComments(String comment){
-        comments = comment;
-}
-public String getAssistantName(){
-        return assistantName;
 
-}
-public void setAssistantName(String assistant){
-        assistantName = assistant;
-}
+    void save() throws IOException {
+        //convert file name
+        String convertFileName = "visitor_" + fullName + ".txt";
 
-    public static String Save(){
-try{
-    File myfile = new File("Visitor_"+visitorName+".txt");
-    if(myfile.createNewFile()){
-        System.out.println("successfully created");
-    }else{
-        System.out.println("file already created");
-    }
-}catch (IOException e){
-    logger.debug("An error occured");
-}
-try {
-    FileOutputStream write = new FileOutputStream("Visitor_"+ visitorName+".txt");
-    ObjectOutputStream  object = new ObjectOutputStream(write);
+        //name of the file must be in lower case and space is replaced by underscore.
+        String fileName = convertFileName.toLowerCase().replace(" ", "_");
 
-    object.writeObject(visitorName);
-    object.writeObject(age);
-    object.writeObject(date);
-    object.writeObject(comments);
-    object.writeObject(assistantName);
+        // use try catch to create and open the file
+        try (FileWriter fileWriter = new FileWriter(fileName)) {
 
-    object.close();
-    write.close();
+            fileWriter.write("Full Name :" + fullName + "\n");
+            fileWriter.write("Age :" + age + "\n");
+            fileWriter.write("Date of Visit :" + LocalDate.now() + "\n");
+            fileWriter.write("Time of Visit :" + LocalTime.now() + "\n");
+            fileWriter.write("Comments :" + comments + "\n");
+            fileWriter.write("Assistant Name :" + assistant_Name);
 
-    FileInputStream inpt = new FileInputStream("Visitor_"+ visitorName+".txt");
-    ObjectInputStream ob = new ObjectInputStream(inpt);
-}catch (FileNotFoundException e){
-    System.out.println("File not found");
-}catch (IOException e){
-    logger.error("Error initializing string");
-    e.printStackTrace();
-}
-return "";
-    }
-    public static String  Load(String visitorName){
-        try {
-            File myfile = new File("Visitor_"+ visitorName+".txt");
-            Scanner scann = new Scanner(myfile);
-            while ((scann.hasNextLine())){
-                String data = scann.nextLine();
-                System.out.println(data);
-            }
-scann.close();
-        }catch (FileNotFoundException e){
-            logger.debug("Arror occcured");
-            e.printStackTrace();
+            logger.info("Saved Successfully!\n");
+
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new IOException("error with a file");
         }
-
-
-        return "";
-
-
     }
+
+    void load(String name) throws IOException {
+
+        // the name should be converted into the proposed file convention
+        String full_Name = "visitor_" + name.toLowerCase().replace(" ", "_") + ".txt";
+
+        //To open the file
+        String line;
+        int i = 0;
+
+        try(BufferedReader fileReader = new BufferedReader(new FileReader(full_Name))){
+            while ((line = fileReader.readLine()) != null ){
+                i++;
+                System.out.println(line);
+            }
+            logger.info("File Was Successfully Read!\n");
+        } catch (Exception e) {
+
+            logger.error(e.getMessage());
+            throw new IOException("File Not Found");
+        }
+    }
+
 
 }
